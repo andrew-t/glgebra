@@ -12,7 +12,7 @@ body:not(.paused) #play,
 .container:not(.paused) [data-function="play"],
 [data-type="checkbox"] .number-only,
 [data-animation="none"] .if-animation,
-#variable-editor:not([data-variable=""]) .create-only,
+#variable-editor:not([data-variable=""]) .create-only
 { display: none !important; }
 
 #variable-editor label {

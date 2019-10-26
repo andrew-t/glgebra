@@ -2,9 +2,10 @@ export const glsl = `#ifdef GL_ES
 	precision highp float;
 #endif
 
-#define MAXITERS 800.0
-#define LENFACTOR .2
+#define MAXITERS 300.0
+#define LENFACTOR .25
 #define NDELTA 0.001
+#define BELT_THRESHOLD 1.01
 
 // built-ins
 uniform vec2 u_resolution;
@@ -123,9 +124,9 @@ void main()
 
 	vec3 col = vec3(1.);
 	vec3 p2 = rotSpace(pos);
-	if (abs(p2.x) > 1.001) col = vec3(1., .757, .224);
-	else if (abs(p2.y) > 1.001) col = vec3(0., .576, .5255);
-	else if (abs(p2.z) > 1.001) col = vec3(.2902, .204, .365);
+	if (abs(p2.z) > BELT_THRESHOLD) col = vec3(.2902, .204, .365);
+	else if (abs(p2.y) > BELT_THRESHOLD) col = vec3(0., .576, .5255);
+	else if (abs(p2.x) > BELT_THRESHOLD) col = vec3(1., .757, .224);
 	col *= rCol * abs(dot(rDir, sceneNormal(pos))) +
 	       gCol * pow(dot(gDir, sceneNormal(pos)), 5.) +
 	       bCol * abs(dot(bDir, sceneNormal(pos)));
@@ -154,6 +155,6 @@ export const variables = [
 	}, {
 		name: 'many_belts', type: 'checkbox', value: false
 	}, {
-		name: 'iter_fog', type: 'checkbox', value: true
+		name: 'iter_fog', type: 'checkbox', value: false
 	}
 ];
