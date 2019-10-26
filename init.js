@@ -2,7 +2,7 @@ import {
 	glsl as defaultShader,
 	variables as defaultVariables
 } from './default-shader.js';
-import { onClick, recompile, updateVariable } from './util.js';
+import { onClick, recompile, updateVariable, updateVariables } from './util.js';
 import openVariableEditor from './variable-editor.js';
 
 document.addEventListener('DOMContentLoaded', e => {
@@ -17,6 +17,7 @@ document.addEventListener('DOMContentLoaded', e => {
 
 	glslCanvas.on('error', e =>
 		errorBox.appendChild(document.createTextNode(e.error)));
+	glslCanvas.on('load', updateVariables);
 
 	onClick('recompile', recompile);
 	onClick('play', () => glslCanvas.play());
@@ -28,7 +29,17 @@ document.addEventListener('DOMContentLoaded', e => {
 			const el = e.target,
 				name = el.getAttribute('data-variable'),
 				variable = variables.find(v => v.name == name);
-			variable.value = parseFloat(el.value);
+			switch (variable.type) {
+				case 'number':
+					variable.value = parseFloat(el.value);
+					break;
+				case 'checkbox':
+					variable.value = !!el.checked;
+					break;
+				default:
+					console.warn('Unexpected variable type', variable);
+					return;
+			}
 			updateVariable(variable);
 		});
 });

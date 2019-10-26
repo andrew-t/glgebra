@@ -1,16 +1,18 @@
 export const variables = [
 	{
-		name: 'speed', value: 160,
+		name: 'speed', type: 'number', value: 160,
 		minimum: 0, maximum: 200
 	}, {
-		name: 'x_flutter', value: 50,
+		name: 'x_flutter', type: 'number', value: 50,
 		minimum: 0, maximum: 100
 	}, {
-		name: 'y_flutter', value: 20,
+		name: 'y_flutter', type: 'number', value: 20,
 		minimum: 0, maximum: 100
 	}, {
-		name: 'amplitude', value: 10,
+		name: 'amplitude', type: 'number', value: 10,
 		minimum: 0, maximum: 100
+	}, {
+		name: 'black_bg', type: 'checkbox', value: false
 	}
 ];
 
@@ -18,13 +20,16 @@ export const glsl = `#ifdef GL_ES
 precision highp float;
 #endif
 
+// built-ins
 uniform vec2 u_resolution;
 uniform float u_time;
 
+// glgebra variables
 uniform float speed;
 uniform float x_flutter;
 uniform float y_flutter;
 uniform float amplitude;
+uniform bool black_bg;
 
 float sdf(vec3 ray) {
 	return ray.y + 0.5
@@ -49,7 +54,9 @@ vec3 normal(vec3 ray) {
 
 const vec3 light = normalize(vec3(-0.6, 0.8, 0.2));
 
-const vec3 bg = vec3(1000.0); // white whatever the lights do
+vec3 bg = black_bg
+	? vec3(-1000.0) // black whatever the lights do
+	: vec3(1000.0); // white whatever the lights do
 
 void main() {
 	vec2 uv = (gl_FragCoord.xy - u_resolution * 0.5) / u_resolution.y;
