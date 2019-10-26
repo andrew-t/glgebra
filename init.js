@@ -14,6 +14,7 @@ document.addEventListener('DOMContentLoaded', e => {
 	const canvas = document.getElementById('shader'),
 		editor = document.getElementById('editor'),
 		errorBox = document.getElementById('error'),
+		editorPopup = document.getElementById('editor-popup'),
 		variableEditor = document.getElementById('variable-editor');
 	editor.value = defaultShader;
 	window.glslCanvas = new GlslCanvas(canvas);
@@ -34,10 +35,19 @@ document.addEventListener('DOMContentLoaded', e => {
 		document.body.classList.add('paused');
 		glslCanvas.pause();
 	});
-	onClick('render', () => forceRender());
+	onClick('render', forceRender);
+
+	onClick('recompile', () => {
+		recompile();
+		editorPopup.classList.add('hidden');
+	});
+	onClick('open-editor', () => editorPopup.classList.remove('hidden'));
+	onClick('close-editor', () => editorPopup.classList.add('hidden'));
 
 	document.getElementById('downscaling')
 		.addEventListener('change', recompile);
+	window.addEventListener('resize',
+		() => setTimeout(recompile));
 
 	onClick('new-variable', () => openVariableEditor());
 	onClick('variables', e => {

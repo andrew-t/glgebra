@@ -37,13 +37,17 @@ export function updateVariables() {
 			${ (!variable.animation || variable.animation == 'none') ? '' :
 				(button(variable, 'play', 'Play') +
 				button(variable, 'pause', 'Pause')) }
-			${button(variable, 'edit', 'Edit')}
-			${button(variable, 'delete', 'Delete')}
+			${button(variable, 'edit', 'Edit', true)}
+			${button(variable, 'delete', 'Delete', true)}
 		</div>`).join('\n');
 }
 
-function button(variable, func, label) {
-	return `<button data-function="${func}" data-variable="${variable.name}">
+function button(variable, func, label, editMode) {
+	return `<button
+		data-function="${func}"
+		data-variable="${variable.name}"
+		${editMode ? 'class="edit-mode-only"' : ''}
+	>
 		${label}
 	</button>`;
 }

@@ -1,20 +1,18 @@
-canvas#shader {
-	width: 50vw;
-	height: 35vw;
-}
-
-.advanced { display: none !important; }
+/* remove these rules to open the editor options */
+.advanced,
+.edit-mode-only
+{ display: none !important; }
 
 .hidden { display: none !important; }
 
-#recompile,
+#render,
 body.paused #pause,
 body:not(.paused) #play,
 .container.paused [data-function="pause"],
 .container:not(.paused) [data-function="play"],
 [data-type="checkbox"] .number-only,
 [data-animation="none"] .if-animation,
-#variable-editor:not([data-variable=""]) .create-only
+#variable-editor:not([data-variable=""]) .create-only,
 { display: none !important; }
 
 #variable-editor label {
@@ -31,6 +29,7 @@ body:not(.paused) #play,
 	overflow-y: auto;
 	padding: 5vmin;
 	box-sizing: border-box;
+	z-index: 10;
 }
 .popup:before {
 	content: '';
@@ -39,7 +38,7 @@ body:not(.paused) #play,
 	position: absolute !important;
 	top: 3vmin;
 	left: 3vmin;
-	width: 96vmin;
+	width: calc(100vw - 6vmin);
 	height: calc(100% - 6vmin);
 	z-index: 0 !important;
 	position: relative;
@@ -49,4 +48,132 @@ body:not(.paused) #play,
 .popup * {
 	position: relative;
 	z-index: 1;
+}
+
+input[type="checkbox"] {
+	width: 2em;
+	height: 1.2em;
+	background: #ddd;
+	border-radius: 0.6em;
+	transition: background-color 300ms;
+	position: relative;
+	appearance: none;
+	-moz-appearance: none;
+	-webkit-appearance: none;
+	float: left;
+	margin: 0 0.5em 0 0;
+}
+input[type="checkbox"]:checked {
+	background: #0d0;
+}
+input[type="checkbox"]:before {
+	position: absolute;
+	left: 0;
+	top: 0;
+	content: '';
+	background: #000;
+	width: 1.2em;
+	height: 1.2em;
+	border-radius: 0.6em;
+	transition: transform 300ms;
+}
+input[type="checkbox"]:checked:before {
+	transform: translateX(0.8em);
+}
+
+/* let's do the basic version first */
+
+body {
+	padding: 0;
+	margin: 0;
+	background: black;
+	overflow-x: hidden;
+}
+
+#shader {
+	width: 100vw;
+	height: 75vw;
+}
+
+body > .buttons {
+	position: absolute;
+	left: 1em;
+	top: 1em;
+}
+
+#controls {
+	background: white;
+	padding: 1em;
+}
+
+#variables input:not([type="checkbox"]) {
+	width: calc(100vw - 15em);
+	float: right;
+}
+#variables > div > label:after {
+	content: '';
+	clear: both;
+	display: block;
+}
+#variables > div {
+	margin: 1em 0;
+}
+
+#controls label {
+	display: block;
+}
+
+#variables button {
+	opacity: 0;
+	transition: opacity 300ms;
+}
+#variables div:hover button {
+	opacity: 1;
+}
+
+@media (max-width: 40em) {
+	#variables input:not([type="checkbox"]) {
+		width: 100%;
+		display: block;
+	}
+}
+
+@media (min-aspect-ratio: 4/3) {
+	body { overflow: hidden; }
+	#shader {
+		position: absolute;
+		left: 0;
+		top: 0;
+		width: 133.33vh;
+		height: 100vh;
+		z-index: 1;
+	}
+	body > .buttons {
+		position: absolute;
+		left: 1em;
+		bottom: 1em;
+		z-index: 2;
+	}
+	#controls {
+		position: absolute;
+		left: calc(100vw - 2em);
+		width: 20em;
+		height: 100vh;
+		overflow: scroll;
+		z-index: 3;
+		transition: transform 300ms;
+	}
+	#controls:hover {
+		transform: translateX(-18em);
+	}
+	#variables input:not([type=checkbox]) {
+		float: none;
+		display: block;
+		width: 20em;
+	}
+}
+
+
+@media (max-width: 30em) {
+
 }
