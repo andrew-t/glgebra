@@ -1,4 +1,5 @@
 import { onClick, updateVariables } from './util.js';
+import { pauseVariable } from './animation.js';
 
 let variableEditor,
 	typeSelector, animationSelector,
@@ -13,6 +14,7 @@ export default function open(v) {
 	setValue('var-animation', v ? v.animation : 'none');
 	setValue('var-period', v ? v.period : '10');
 	updateAttributes();
+	pauseVariable(v);
 	variableEditor.classList.remove('hidden');
 }
 

@@ -5,10 +5,14 @@ const animating = {};
 export function playVariable(variable) {
 	// Might replace this with some richer truthy object down the line, maybe when bounce comes in.
 	animating[variable.name] = true;
+	const el = document.querySelector(`div[data-variable="${variable.name}"]`);
+	if (el) el.classList.remove('paused');
 }
 
 export function pauseVariable(variable) {
 	animating[variable.name] = false;
+	const el = document.querySelector(`div[data-variable="${variable.name}"]`);
+	if (el) el.classList.add('paused');
 }
 
 document.addEventListener('DOMContentLoaded', e => update());

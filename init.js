@@ -19,14 +19,21 @@ document.addEventListener('DOMContentLoaded', e => {
 	window.glslCanvas = new GlslCanvas(canvas);
 	window.variables = defaultVariables;
 	recompile();
+	glslCanvas.pause();
 
 	glslCanvas.on('error', e =>
 		errorBox.appendChild(document.createTextNode(e.error)));
 	glslCanvas.on('load', updateVariables);
 
 	onClick('recompile', recompile);
-	onClick('play', () => glslCanvas.play());
-	onClick('pause', () => glslCanvas.pause());
+	onClick('play', () => {
+		document.body.classList.remove('paused');
+		glslCanvas.play();
+	});
+	onClick('pause', () => {
+		document.body.classList.add('paused');
+		glslCanvas.pause();
+	});
 	onClick('render', () => forceRender());
 
 	onClick('new-variable', () => openVariableEditor());

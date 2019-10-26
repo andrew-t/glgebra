@@ -3,8 +3,15 @@ canvas#shader {
 	height: 35vw;
 }
 
+.advanced { display: none !important; }
+
 .hidden { display: none !important; }
 
+#recompile,
+body.paused #pause,
+body:not(.paused) #play,
+.container.paused [data-function="pause"],
+.container:not(.paused) [data-function="play"],
 [data-type="checkbox"] .number-only,
 [data-animation="none"] .if-animation,
 #variable-editor:not([data-variable=""]) .create-only

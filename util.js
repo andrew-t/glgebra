@@ -28,7 +28,10 @@ export function updateVariables() {
 	console.log('Setting uniforms');
 	variables.forEach(updateVariable);
 	document.getElementById('variables').innerHTML =
-		variables.map(variable => `<div>
+		variables.map(variable => `<div
+			class="container paused"
+			data-variable="${variable.name}"
+		>
 			${ renderControls(variable) }
 			${ (!variable.animation || variable.animation == 'none') ? '' :
 				(button(variable, 'play', 'Play') +
