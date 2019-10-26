@@ -1,13 +1,16 @@
 import { onClick, updateVariables } from './util.js';
 
 let variableEditor,
+	typeSelector, animationSelector,
 	variable;
 
 export default function open(v) {
 	variable = v;
 	setValue('var-name', v ? v.name : '');
+	setValue('var-type', v ? v.type : 'number');
 	setValue('var-min', v ? v.minimum : 0);
 	setValue('var-max', v ? v.maximum : 100);
+	updateAttributes();
 	variableEditor.classList.remove('hidden');
 }
 
@@ -21,8 +24,18 @@ function getNumber(id) {
 	return parseFloat(getValue(id));
 }
 
+function updateAttributes() {
+	variableEditor.setAttribute('data-type', typeSelector.value);
+	variableEditor.setAttribute('data-animation', animationSelector.value);
+}
+
 document.addEventListener('DOMContentLoaded', e => {
 	variableEditor = document.getElementById('variable-editor');
+	typeSelector = document.getElementById('var-type');
+	animationSelector = document.getElementById('var-animation');
+	typeSelector.addEventListener('change', updateAttributes);
+	animationSelector.addEventListener('change', updateAttributes);
+
 	onClick('var-cancel', () => variableEditor.classList.add('hidden'));
 	onClick('var-ok', () => {
 		const name = getValue('var-name');

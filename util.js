@@ -13,6 +13,21 @@ export function recompile() {
 	});
 }
 
+let renderQueued = false;
+export function forceRender() {
+	if (renderQueued || !glslCanvas.paused) return;
+	renderQueued = true;
+	setTimeout(() => {
+		glslCanvas.on('render', done);
+		glslCanvas.play();
+		renderQueued = false;
+	});
+	function done() {
+		glslCanvas.pause();
+		glslCanvas.off('render', done);
+	}
+}
+
 export function updateVariables() {
 	console.log('Setting uniforms');
 	variables.forEach(updateVariable);
@@ -50,4 +65,5 @@ export function updateVariable(variable) {
 	if (variable.type == 'checkbox')
 		glslCanvas.uniform('1i', 'bool', variable.name, !!variable.value);
 	else glslCanvas.setUniform(variable.name, variable.value);
+	forceRender();
 }

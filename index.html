@@ -15,12 +15,43 @@
 	<div id="error"></div>
 	<div id="variables"></div>
 	<button id="new-variable">New variable</button>
-	<div id="variable-editor" class="hidden">
-		<label>Name: <input id="var-name" required pattern="^[a-zA-Z_][a-zA-Z_0-9]*$"></label>
-		<label>Minimum: <input id="var-min" type="number" required min="0"></label>
-		<label>Maximum: <input id="var-max" type="number" required min="1"></label>
-		<button id="var-ok">OK</button>
-		<button id="var-cancel">Cancel</button>
+	<div id="variable-editor" class="hidden popup">
+		<label>
+			Name
+			<input id="var-name" required pattern="^[a-zA-Z_][a-zA-Z_0-9]*$">
+		</label>
+		<label>
+			Type
+			<select id="var-type">
+				<option value="number">Number</option>
+				<option value="checkbox">Checkbox</option>
+			</select>
+		</label>
+		<label class="number-only">
+			Minimum
+			<input id="var-min" type="number" required min="0">
+		</label>
+		<label class="number-only">
+			Maximum
+			<input id="var-max" type="number" required min="1">
+		</label>
+		<label class="number-only">
+			Animation type
+			<select id="var-animation">
+				<option value="none">None</option>
+				<option value="once">Once</option>
+				<option value="loop">Loop</option>
+				<!--option value="bounce">Bounce</option-->
+			</select>
+		</label>
+		<label class="if-animation number-only">
+			Animation period
+			<input id="var-period" type="number" required>
+		</label>
+		<div class="buttons">
+			<button id="var-ok">OK</button>
+			<button id="var-cancel">Cancel</button>
+		</div>
 	</div>
 </body>
 </html>
