@@ -1,103 +1,144 @@
-export const variables = [
-	{
-		name: 'speed', type: 'number', value: 160,
-		minimum: 0, maximum: 200,
-		animation: 'none'
-	}, {
-		name: 'x_flutter', type: 'number', value: 50,
-		minimum: 0, maximum: 100,
-		animation: 'none'
-	}, {
-		name: 'y_flutter', type: 'number', value: 20,
-		minimum: 0, maximum: 100,
-		animation: 'none'
-	}, {
-		name: 'amplitude', type: 'number', value: 10,
-		minimum: 0, maximum: 100,
-		animation: 'none'
-	}, {
-		name: 'black_bg', type: 'checkbox', value: false
-	}
-];
-
 export const glsl = `#ifdef GL_ES
-precision highp float;
+	precision highp float;
 #endif
+
+#define MAXITERS 800.0
+#define LENFACTOR .2
+#define NDELTA 0.001
 
 // built-ins
 uniform vec2 u_resolution;
-uniform float u_time;
+// variables
+uniform float axis_angle;
+uniform float const_angle;
+uniform float belt_length;
+uniform bool spin_camera;
+uniform bool draw_axis;
 
-// glgebra variables
-uniform float speed;
-uniform float x_flutter;
-uniform float y_flutter;
-uniform float amplitude;
-uniform bool black_bg;
+#define NDELTAX vec3(NDELTA, 0., 0.)
+#define NDELTAY vec3(0., NDELTA, 0.)
+#define NDELTAZ vec3(0., 0., NDELTA)
 
-float sdf(vec3 ray) {
-	return ray.y + 0.5
-		+ sin(ray.z * x_flutter * 0.1 + u_time * (1.0 - speed * 0.01))
-			* cos(ray.x * y_flutter * 0.1)
-			* amplitude * 0.01;
+float box(vec3 p, vec3 centre, vec3 dims) {
+	vec3 d = abs(p - centre) - dims;
+	return max(d.x, max(d.y, d.z));
 }
 
-mat2 rotate(float theta) {
-	float s = sin(theta), c = cos(theta);
+const vec3 rDir = normalize(vec3(-3.0, 4.0, -2.0)), rCol = vec3(1.0, 0.6, 0.4),
+	bDir = normalize(vec3(2.0, 3.0, -4.0)), bCol = vec3(0.3, 0.7, 1.0),
+	gDir = normalize(vec3(4.0, -3.0, 0.0)), gCol = vec3(0.7, 1.0, 0.8);
+
+// from http://www.neilmendoza.com/glsl-rotation-about-an-arbitrary-axis/
+mat3 rotationMatrix(vec3 axis, float angle)
+{
+	// axis = normalize(axis);
+	float s = sin(angle);
+	float c = cos(angle);
+	float oc = 1.0 - c;
+	
+	return mat3(oc * axis.x * axis.x + c,           oc * axis.x * axis.y - axis.z * s,  oc * axis.z * axis.x + axis.y * s, // 0.0,
+				oc * axis.x * axis.y + axis.z * s,  oc * axis.y * axis.y + c,           oc * axis.y * axis.z - axis.x * s, // 0.0,
+				oc * axis.z * axis.x - axis.y * s,  oc * axis.y * axis.z + axis.x * s,  oc * axis.z * axis.z + c);          // 0.0,
+			   // 0.0,                                0.0,                                0.0,                                1.0);
+}
+
+const float pi = 3.1415926536;
+
+mat2 rot(float t) {
+	float s = sin(t), c = cos(t);
 	return mat2(c, s, -s, c);
 }
 
-const vec2 epsilon = vec2(0.01, 0.0);
-vec3 normal(vec3 ray) {
+vec3 axis() {
+	return vec3(
+		cos(axis_angle * pi * 4. / 1000.),
+		0.,
+		sin(axis_angle * pi * 4. / 1000.));
+}
+
+vec3 rotSpace(vec3 p) {
+	// rotate space!!!
+	float angle = pi * pow(smoothstep(100., 2., dot(p, p)), 5.)
+		* const_angle / 1000.;
+	if (angle <= 0.) return p;
+	return p * rotationMatrix(axis(), angle);
+}
+
+float scene(vec3 p) {
+	p = rotSpace(p);
+	
+	float l = belt_length / 30.;
+	l = 1. + max(0., min(pow(l, 2.), 1000.));
+	float d = min(box(p, vec3(0.), vec3(0.7, 0.1, l)),
+			  min(box(p, vec3(0.), vec3(0.1, l, 0.7)),
+			  min(box(p, vec3(0.), vec3(l, 0.7, 0.1)),
+				  box(p, vec3(0.), vec3(1.))
+			  )));
+	if (draw_axis) {
+		vec3 a = axis();
+		d = min(d, length(cross(p, a)) - 0.1);
+	}
+	return d;
+}
+	
+vec3 sceneNormal(vec3 p) {
 	return normalize(vec3(
-		sdf(ray + epsilon.xyy) - sdf(ray - epsilon.xyy),
-		sdf(ray + epsilon.yxy) - sdf(ray - epsilon.yxy),
-		sdf(ray + epsilon.yyx) - sdf(ray - epsilon.yyx)
+		scene(p + NDELTAX) - scene(p - NDELTAX),
+		scene(p + NDELTAY) - scene(p - NDELTAY),
+		scene(p + NDELTAZ) - scene(p - NDELTAZ)
 	));
 }
 
-const vec3 light = normalize(vec3(-0.6, 0.8, 0.2));
 
-vec3 bg = black_bg
-	? vec3(-1000.0) // black whatever the lights do
-	: vec3(1000.0); // white whatever the lights do
+void main()
+{
+	vec2 uv = (gl_FragCoord.xy - u_resolution.xy * 0.5) / u_resolution.y;
+	vec3 ray = normalize(vec3(uv, 1.));
+	ray.yz *= rot(-0.12);
+	ray.xz *= rot(-0.7853981634);
+	vec3 cam = vec3(10., 2., -10.);
+	if (spin_camera) {
+		cam.xz *= rot(pi * 0.75 - axis_angle * pi * 4. / 1000.);
+		ray.xz *= rot(pi * 0.75 - axis_angle * pi * 4. / 1000.);
+	}
+	
+	vec3 pos = cam;
+	float iters = 0.;
+	for (float i = 0.; i < MAXITERS; ++i) {
+		float dist = scene(pos);
+		if (dist < 0.001) { iters = i; break; }
+		pos += ray * dist * LENFACTOR;
+	}
 
-void main() {
-	vec2 uv = (gl_FragCoord.xy - u_resolution * 0.5) / u_resolution.y;
-	vec3 ray = normalize(vec3(uv, 1.0));
-	vec3 cam = vec3(0.0);
-	ray.yz *= rotate(-1.0); // made up number
-	ray.xy *= rotate(-0.5); // radians, about 30º
-	ray.xz *= rotate(-1.0); // made up number
-	
-	for (int i = 0; i < 100; ++i)
-		cam += ray * sdf(cam) * 0.9;
-	
-	// gl_FragColor = vec4(fract(cam * 3.0), 1.0); return;
-	
-	vec3 n = normal(cam);
-	// gl_FragColor = vec4(n * 0.5 + 0.5, 1.0); return;
-	float l = dot(n, light);
-	l += pow(l, 5.0);
-	
-	vec3 col = bg;
-	float pos = (cam.x + 0.6);
-	if (pos < 0.0)
-		col = bg;
-	else if (pos < 0.16666)
-		col = vec3(0.89, 0.01, 0.01);
-	else if (pos < 0.33333)
-		col = vec3(1.0, 0.55, 0.0);
-	else if (pos < 0.5)
-		col = vec3(1.0, 0.93, 0.0);
-	else if (pos < 0.66666)
-		col = vec3(0.0, .5, 0.15);
-	else if (pos < 0.83333)
-		col = vec3(0.0, 0.3, 1.0);
-	else if (pos < 1.0)
-		col = vec3(0.46, 0.03, 0.53);
-
-	gl_FragColor = vec4(col * l, 1.0);
+	vec3 col = vec3(1.);
+	vec3 p2 = rotSpace(pos);
+	if (abs(p2.x) > 1.001) col = vec3(1., .757, .224);
+	else if (abs(p2.y) > 1.001) col = vec3(0., .576, .5255);
+	else if (abs(p2.z) > 1.001) col = vec3(.2902, .204, .365);
+	gl_FragColor = vec4(col * (
+		rCol * abs(dot(rDir, sceneNormal(pos))) +
+		gCol * pow(dot(gDir, sceneNormal(pos)), 5.) +
+		bCol * abs(dot(bDir, sceneNormal(pos)))
+	) * (1.0 - pow(iters / 300., 2.)), 1.0);
 }
-
 `;
+
+export const variables = [
+	{
+		name: 'axis_angle', type: 'number', value: 0,
+		minimum: 0, maximum: 1000,
+		animation: 'loop', period: 10
+	}, {
+		name: 'const_angle', type: 'number', value: 1000,
+		minimum: 0, maximum: 1000,
+		animation: 'once', period: 1
+	}, {
+		name: 'belt_length', type: 'number', value: 1000,
+		minimum: 0, maximum: 1000,
+		animation: 'once', period: 20
+	}, {
+		name: 'spin_camera', type: 'checkbox', value: false
+	}, {
+		name: 'draw_axis', type: 'checkbox', value: false
+	}
+];

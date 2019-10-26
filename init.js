@@ -36,6 +36,9 @@ document.addEventListener('DOMContentLoaded', e => {
 	});
 	onClick('render', () => forceRender());
 
+	document.getElementById('downscaling')
+		.addEventListener('change', recompile);
+
 	onClick('new-variable', () => openVariableEditor());
 	onClick('variables', e => {
 		const el = e.target,

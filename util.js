@@ -3,9 +3,10 @@ export function onClick(id, cb) {
 }
 
 export function recompile() {
-	const canvas = document.getElementById('shader');
-	canvas.width = canvas.clientWidth * devicePixelRatio;
-	canvas.height = canvas.clientHeight * devicePixelRatio;
+	const canvas = document.getElementById('shader'),
+		downscaling = parseFloat(document.getElementById('downscaling').value) || 1;
+	canvas.width = canvas.clientWidth * devicePixelRatio / downscaling;
+	canvas.height = canvas.clientHeight * devicePixelRatio / downscaling;
 	document.getElementById('error').innerHTML = '';
 	setTimeout(() => {
 		console.log(`Recompiling shader`);
