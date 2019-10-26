@@ -14,6 +14,8 @@ uniform float const_angle;
 uniform float belt_length;
 uniform bool spin_camera;
 uniform bool draw_axis;
+uniform bool many_belts;
+uniform bool iter_fog;
 
 #define NDELTAX vec3(NDELTA, 0., 0.)
 #define NDELTAY vec3(0., NDELTA, 0.)
@@ -69,14 +71,22 @@ float scene(vec3 p) {
 	
 	float l = belt_length / 30.;
 	l = 1. + max(0., min(pow(l, 2.), 1000.));
-	float d = min(box(p, vec3(0.), vec3(0.7, 0.1, l)),
-			  min(box(p, vec3(0.), vec3(0.1, l, 0.7)),
-			  min(box(p, vec3(0.), vec3(l, 0.7, 0.1)),
-				  box(p, vec3(0.), vec3(1.))
-			  )));
+	float d = box(p, vec3(0.), vec3(1.));
 	if (draw_axis) {
 		vec3 a = axis();
 		d = min(d, length(cross(p, a)) - 0.1);
+	}
+	if (many_belts) {
+		for (float a = 0.; a < pi; a += pi * 0.25) {
+			d = min(d, length((p * rotationMatrix(vec3(0.,0.,1.),a)).zy) - 0.1);
+			d = min(d, length((p * rotationMatrix(vec3(0.,1.,0.),a)).zy) - 0.1);
+			d = min(d, length((p * rotationMatrix(vec3(1.,0.,0.),a)).xy) - 0.1);
+		}
+	} else {
+		d = min(d,
+		    min(box(p, vec3(0.), vec3(0.1, l, 0.7)),
+		    min(box(p, vec3(0.), vec3(l, 0.7, 0.1)),
+		        box(p, vec3(0.), vec3(0.7, 0.1, l)))));
 	}
 	return d;
 }
@@ -116,11 +126,11 @@ void main()
 	if (abs(p2.x) > 1.001) col = vec3(1., .757, .224);
 	else if (abs(p2.y) > 1.001) col = vec3(0., .576, .5255);
 	else if (abs(p2.z) > 1.001) col = vec3(.2902, .204, .365);
-	gl_FragColor = vec4(col * (
-		rCol * abs(dot(rDir, sceneNormal(pos))) +
-		gCol * pow(dot(gDir, sceneNormal(pos)), 5.) +
-		bCol * abs(dot(bDir, sceneNormal(pos)))
-	) * (1.0 - pow(iters / 300., 2.)), 1.0);
+	col *= rCol * abs(dot(rDir, sceneNormal(pos))) +
+	       gCol * pow(dot(gDir, sceneNormal(pos)), 5.) +
+	       bCol * abs(dot(bDir, sceneNormal(pos)));
+	if (iter_fog) col *= 1.0 - pow(iters / 300., 2.);
+	gl_FragColor = vec4(col, 1.0);
 }
 `;
 
@@ -141,5 +151,9 @@ export const variables = [
 		name: 'spin_camera', type: 'checkbox', value: false
 	}, {
 		name: 'draw_axis', type: 'checkbox', value: false
+	}, {
+		name: 'many_belts', type: 'checkbox', value: false
+	}, {
+		name: 'iter_fog', type: 'checkbox', value: true
 	}
 ];
