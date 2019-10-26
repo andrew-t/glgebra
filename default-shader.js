@@ -107,7 +107,8 @@ void main()
 	for (float i = 0.; i < MAXITERS; ++i) {
 		float dist = scene(pos);
 		if (dist < 0.001) { iters = i; break; }
-		pos += ray * dist * LENFACTOR;
+		if (dot(pos, pos) < 100.) dist *= LENFACTOR;
+		pos += ray * dist;
 	}
 
 	vec3 col = vec3(1.);
@@ -127,11 +128,11 @@ export const variables = [
 	{
 		name: 'axis_angle', type: 'number', value: 0,
 		minimum: 0, maximum: 1000,
-		animation: 'loop', period: 10
+		animation: 'loop', period: 30
 	}, {
 		name: 'const_angle', type: 'number', value: 1000,
 		minimum: 0, maximum: 1000,
-		animation: 'once', period: 1
+		animation: 'none'
 	}, {
 		name: 'belt_length', type: 'number', value: 1000,
 		minimum: 0, maximum: 1000,
