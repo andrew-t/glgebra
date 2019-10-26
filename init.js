@@ -4,6 +4,7 @@ import {
 } from './default-shader.js';
 import { onClick, recompile, updateVariable, updateVariables } from './util.js';
 import openVariableEditor from './variable-editor.js';
+import { playVariable, pauseVariable } from './animation.js';
 
 document.addEventListener('DOMContentLoaded', e => {
 	const canvas = document.getElementById('shader'),
@@ -37,6 +38,12 @@ document.addEventListener('DOMContentLoaded', e => {
 			case 'delete':
 				window.variables = variables.filter(v => v != variable);
 				recompile();
+				break;
+			case 'play':
+				playVariable(variable);
+				break;
+			case 'pause':
+				pauseVariable(variable);
 				break;
 		}
 	});

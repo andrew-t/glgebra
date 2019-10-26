@@ -10,6 +10,8 @@ export default function open(v) {
 	setValue('var-type', v ? v.type : 'number');
 	setValue('var-min', v ? v.minimum : 0);
 	setValue('var-max', v ? v.maximum : 100);
+	setValue('var-animation', v ? v.animation : 'none');
+	setValue('var-period', v ? v.period : '10');
 	updateAttributes();
 	variableEditor.classList.remove('hidden');
 }
@@ -39,6 +41,12 @@ document.addEventListener('DOMContentLoaded', e => {
 
 	onClick('var-cancel', () => variableEditor.classList.add('hidden'));
 	onClick('var-ok', () => {
+		for (const el of document.querySelectorAll(`#variable-editor input`))
+			if (window.getComputedStyle(el).display != 'none' &&
+				!el.validity.valid) {
+				alert('Please complete all the fields');
+				return;
+			}
 		const name = getValue('var-name');
 		if (variable) {
 			variable.name = name;

@@ -17,15 +17,10 @@ let renderQueued = false;
 export function forceRender() {
 	if (renderQueued || !glslCanvas.paused) return;
 	renderQueued = true;
-	setTimeout(() => {
-		glslCanvas.on('render', done);
-		glslCanvas.play();
+	requestAnimationFrame(() => {
+		glslCanvas.render();
 		renderQueued = false;
 	});
-	function done() {
-		glslCanvas.pause();
-		glslCanvas.off('render', done);
-	}
 }
 
 export function updateVariables() {
@@ -71,7 +66,7 @@ function renderControls(variable) {
 }
 
 export function updateVariable(variable) {
-	console.log(`Setting ${variable.name} to ${variable.value}`);
+	//console.log(`Setting ${variable.name} to ${variable.value}`);
 	// special-case because bools seem buggy in GlslCanvas at present:
 	if (variable.type == 'checkbox')
 		glslCanvas.uniform('1i', 'bool', variable.name, !!variable.value);
