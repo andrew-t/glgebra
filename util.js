@@ -18,7 +18,8 @@ export function forceRender() {
 	if (renderQueued || !glslCanvas.paused) return;
 	renderQueued = true;
 	requestAnimationFrame(() => {
-		glslCanvas.render();
+		// You can normally use .render() here but this is needed to support the boolean-uniform hack
+		glslCanvas.renderPrograms();
 		renderQueued = false;
 	});
 }

@@ -2,7 +2,11 @@ import {
 	glsl as defaultShader,
 	variables as defaultVariables
 } from './default-shader.js';
-import { onClick, recompile, updateVariable, updateVariables } from './util.js';
+import {
+	onClick,
+	recompile, forceRender,
+	updateVariable, updateVariables
+} from './util.js';
 import openVariableEditor from './variable-editor.js';
 import { playVariable, pauseVariable } from './animation.js';
 
@@ -23,6 +27,7 @@ document.addEventListener('DOMContentLoaded', e => {
 	onClick('recompile', recompile);
 	onClick('play', () => glslCanvas.play());
 	onClick('pause', () => glslCanvas.pause());
+	onClick('render', () => forceRender());
 
 	onClick('new-variable', () => openVariableEditor());
 	onClick('variables', e => {
