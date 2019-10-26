@@ -1,0 +1,6 @@
+canvas#shader {
+	width: 50vw;
+	height: 35vw;
+}
+
+.hidden { display: none !important; }

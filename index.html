@@ -1,0 +1,26 @@
+<!DOCTYPE html>
+<html>
+<head>
+	<title>andrewt.net / glgebra</title>
+	<script type="text/javascript" src="lib/glsl-canvas.js"></script>
+	<script type="module" src="init.js"></script>
+	<link rel="stylesheet" type="text/css" href="styles.css">
+</head>
+<body>
+	<canvas id="shader"></canvas>
+	<textarea id="editor"></textarea>
+	<button id="play">Play</button>
+	<button id="pause">Pause</button>
+	<button id="recompile">Recompile</button>
+	<div id="error"></div>
+	<div id="variables"></div>
+	<button id="new-variable">New variable</button>
+	<div id="variable-editor" class="hidden">
+		<label>Name: <input id="var-name" required pattern="^[a-zA-Z_][a-zA-Z_0-9]*$"></label>
+		<label>Minimum: <input id="var-min" type="number" required min="0"></label>
+		<label>Maximum: <input id="var-max" type="number" required min="1"></label>
+		<button id="var-ok">OK</button>
+		<button id="var-cancel">Cancel</button>
+	</div>
+</body>
+</html>
