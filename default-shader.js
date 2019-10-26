@@ -1,16 +1,20 @@
 export const variables = [
 	{
 		name: 'speed', type: 'number', value: 160,
-		minimum: 0, maximum: 200
+		minimum: 0, maximum: 200,
+		animation: 'none'
 	}, {
 		name: 'x_flutter', type: 'number', value: 50,
-		minimum: 0, maximum: 100
+		minimum: 0, maximum: 100,
+		animation: 'none'
 	}, {
 		name: 'y_flutter', type: 'number', value: 20,
-		minimum: 0, maximum: 100
+		minimum: 0, maximum: 100,
+		animation: 'none'
 	}, {
 		name: 'amplitude', type: 'number', value: 10,
-		minimum: 0, maximum: 100
+		minimum: 0, maximum: 100,
+		animation: 'none'
 	}, {
 		name: 'black_bg', type: 'checkbox', value: false
 	}

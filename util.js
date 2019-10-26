@@ -32,31 +32,42 @@ export function updateVariables() {
 	console.log('Setting uniforms');
 	variables.forEach(updateVariable);
 	document.getElementById('variables').innerHTML =
-		variables.map(variable => {
-			switch (variable.type) {
-				case 'number':
-					return `<div>
-						<label>
-							${variable.name}
-							<input type="range"
-								data-variable="${variable.name}"
-								min="${variable.minimum}"
-								max="${variable.maximum}"
-								value="${variable.value}">
-						</label>
-					</div>`;
-				case 'checkbox':
-					return `<div>
-						<label>
-							${variable.name}
-							<input type="checkbox"
-								data-variable="${variable.name}"
-								${variable.value ? 'checked' : ''}>
-						</label>
-					</div>`;
-				default: return `<div>Unknown variable type: ${variable.type}</div>`;
-			}
-		}).join('\n');
+		variables.map(variable => `<div>
+			${ renderControls(variable) }
+			${ (!variable.animation || variable.animation == 'none') ? '' :
+				(button(variable, 'play', 'Play') +
+				button(variable, 'pause', 'Pause')) }
+			${button(variable, 'edit', 'Edit')}
+			${button(variable, 'delete', 'Delete')}
+		</div>`).join('\n');
+}
+
+function button(variable, func, label) {
+	return `<button data-function="${func}" data-variable="${variable.name}">
+		${label}
+	</button>`;
+}
+
+function renderControls(variable) {
+	switch (variable.type) {
+		case 'number':
+			return `<label>
+				${variable.name}
+				<input type="range"
+					data-variable="${variable.name}"
+					min="${variable.minimum}"
+					max="${variable.maximum}"
+					value="${variable.value}">
+			</label>`;
+		case 'checkbox':
+			return `<label>
+				${variable.name}
+				<input type="checkbox"
+					data-variable="${variable.name}"
+					${variable.value ? 'checked' : ''}>
+			</label>`;
+		default: return `<div>Unknown variable type: ${variable.type}</div>`;
+	}
 }
 
 export function updateVariable(variable) {

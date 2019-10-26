@@ -22,7 +22,24 @@ document.addEventListener('DOMContentLoaded', e => {
 	onClick('recompile', recompile);
 	onClick('play', () => glslCanvas.play());
 	onClick('pause', () => glslCanvas.pause());
+
 	onClick('new-variable', () => openVariableEditor());
+	onClick('variables', e => {
+		const el = e.target,
+			variableName = el.getAttribute('data-variable');
+		if (!variableName) return;
+		const variable = variables.find(v => v.name == variableName);
+		if (!variable) throw new Error('Variable not found ' + variableName);
+		switch (el.getAttribute('data-function')) {
+			case 'edit':
+				openVariableEditor(variable);
+				break;
+			case 'delete':
+				window.variables = variables.filter(v => v != variable);
+				recompile();
+				break;
+		}
+	});
 
 	document.getElementById('variables')
 		.addEventListener('input', e => {

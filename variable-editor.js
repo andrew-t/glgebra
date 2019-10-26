@@ -25,6 +25,7 @@ function getNumber(id) {
 }
 
 function updateAttributes() {
+	variableEditor.setAttribute('data-variable', variable ? variable.name : '');
 	variableEditor.setAttribute('data-type', typeSelector.value);
 	variableEditor.setAttribute('data-animation', animationSelector.value);
 }
@@ -41,19 +42,34 @@ document.addEventListener('DOMContentLoaded', e => {
 		const name = getValue('var-name');
 		if (variable) {
 			variable.name = name;
-			variable.minimum = getNumber('var-min');
-			variable.maximum = getNumber('var-max');
+			if (variable.type == 'number') {
+				variable.minimum = getNumber('var-min');
+				variable.maximum = getNumber('var-max');
+				variable.animation = getValue('var-animation');
+				if (variable.animation != 'none')
+					variable.period = getNumber('var-period');
+				else delete variable.period;
+			}
 		} else if (variables.some(v => v.name == name)) {
 			alert('Name is already used');
 			return;
 		} else {
-			const minimum = getNumber('var-min');
-			variables.push({
-				name,
-				minimum,
-				maximum: getNumber('var-max'),
-				value: minimum
-			});
+			if (getValue('var-type') == 'checkbox')
+				variables.push({ type: 'checkbox', name });
+			else {
+				const minimum = getNumber('var-min'),
+					animation = getValue('var-animation'),
+					variable = {
+						name,
+						type: 'number',
+						minimum,
+						maximum: getNumber('var-max'),
+						value: minimum
+					};
+				if (animation != 'none')
+					variable.period = getNumber('var-period');
+				variables.push(variable);
+			}
 		}
 		variableEditor.classList.add('hidden');
 		updateVariables();

@@ -6,7 +6,8 @@ canvas#shader {
 .hidden { display: none !important; }
 
 [data-type="checkbox"] .number-only,
-[data-animation="none"] .if-animation
+[data-animation="none"] .if-animation,
+#variable-editor:not([data-variable=""]) .create-only
 { display: none !important; }
 
 #variable-editor label {
