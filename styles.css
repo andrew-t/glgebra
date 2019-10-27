@@ -81,6 +81,13 @@ input[type="checkbox"]:checked:before {
 	transform: translateX(0.8em);
 }
 
+label, button {
+	font-family: Lato, sans-serif;
+}
+textarea, input {
+	font-family: 'Comic Code', 'Input Sans', monospace;
+}
+
 /* let's do the basic version first */
 
 body {
@@ -172,7 +179,6 @@ body > .buttons {
 		width: 20em;
 	}
 }
-
 
 @media (max-width: 30em) {
 
